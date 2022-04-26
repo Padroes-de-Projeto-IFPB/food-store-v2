@@ -16,25 +16,31 @@ public class PaymentService {
         CREDIT_CARD, DEBIT, BILLET, PAYPAL
     }
 
+    private Payment payment;
+    private Factory type = new Factory();
     private final LogService logService;
 
     public void doPayment(PaymentType paymentType) throws Exception {
-        switch (paymentType) {
-            case CREDIT_CARD:
-                logService.info("Do credit card payment!");
-                break;
-            case DEBIT:
-                logService.info("Do debit payment!");
-                break;
-            case PAYPAL:
-                logService.info("Do paypal payment!");
-                break;
-            case BILLET:
-                logService.info("Do billet payment!");
-                break;
-            default:
-                throw new Exception("unknown payment method");
-        }
+        payment = type.TipoPagamento(paymentType);
+
+        logService.info(payment.getPayment());
+
+//        switch (paymentType) {
+//            case CREDIT_CARD:
+//                logService.info("Do credit card payment!");
+//                break;
+//            case DEBIT:
+//                logService.info("Do debit payment!");
+//                break;
+//            case PAYPAL:
+//                logService.info("Do paypal payment!");
+//                break;
+//            case BILLET:
+//                logService.info("Do billet payment!");
+//                break;
+//            default:
+//                throw new Exception("unknown payment method");
+//        }
     }
 
 }
