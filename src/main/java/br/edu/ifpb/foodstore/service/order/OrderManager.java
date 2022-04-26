@@ -11,40 +11,34 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OrderManager {
 
-    private final PaymentService paymentService;
+    private final PaymentService   paymentService;
     private final MailNotification mailNotification;
-    private final LogService logService;
+    private final LogService       logService;
 
     public void payOrder(Order order, PaymentService.PaymentType paymentType) {
-        order.setStatus(Order.OrderStatus.IN_PROGRESS);
+        order.setStatus(Order.OrderEnum.IN_PROGRESS);
         try {
             paymentService.doPayment(paymentType);
-            order.setStatus(Order.OrderStatus.PAYMENT_SUCCESS);
+            order.setStatus(Order.OrderEnum.PAYMENT_SUCCESS);
             mailNotification.sendMailNotificationToAdmin(String.format("Order %d completed successfully", order.getId()));
             mailNotification.sendMailNotificationToCustomer(String.format("Order %d completed successfully", order.getId()), order.getCustomer());
             logService.info("payment finished");
         } catch (Exception e) {
             logService.error("payment refused");
-            order.setStatus(Order.OrderStatus.PAYMENT_REFUSED);
+            order.setStatus(Order.OrderEnum.PAYMENT_REFUSED);
             mailNotification.sendMailNotificationToAdmin(String.format("Order %d refused", order.getId()));
         }
     }
 
     public void cancelOrder(Order order) throws OrderException {
-        switch(order.getStatus()) {
-            case CANCELED:
-                throw new OrderException("Order already canceled!");
-            case IN_PROGRESS:
-                logService.info("Canceling in progress order");
-                break;
-            case PAYMENT_REFUSED:
-                logService.info("Canceling refused order");
-                break;
-            case PAYMENT_SUCCESS:
-                logService.info("Canceling already paid order");
-                break;
+        if (order.getStatus() == Order.OrderEnum.CANCELED) {
+            throw new OrderException(order.getStatus().cancel());
         }
-        order.setStatus(Order.OrderStatus.CANCELED);
+        else {
+            logService.info(order.getStatus().cancel());
+        }
+
+        order.setStatus(Order.OrderEnum.CANCELED);
         mailNotification.sendMailNotificationToAdmin(String.format("Order %d canceled", order.getId()));
         mailNotification.sendMailNotificationToCustomer(String.format("Order %d canceled", order.getId()), order.getCustomer());
         logService.debug(String.format("order %d canceled", order.getId()));
