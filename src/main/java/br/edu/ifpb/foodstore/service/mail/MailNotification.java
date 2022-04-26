@@ -14,12 +14,12 @@ public class MailNotification {
     private String emailAdministration = "contact@food-store.com";
 
     public void sendMailNotificationToCustomer(String message, Customer customer) {
-        logService.info("send mail notification to "+ customer.getEmail());
+        logService.info("send mail notification to " + customer.getEmail());
         logService.debug(message);
     }
 
     public void sendMailNotificationToAdmin(String message) {
-        logService.info("send mail notification to "+emailAdministration);
+        logService.info("send mail notification to " + emailAdministration);
         logService.debug(message);
     }
 
