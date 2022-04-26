@@ -7,6 +7,9 @@ import br.edu.ifpb.foodstore.domain.Product;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import br.edu.ifpb.foodstore.service.mail.MailNotification;
 import br.edu.ifpb.foodstore.service.payment.PaymentService;
+import br.edu.ifpb.foodstore.service.payment.estrategias.Billet;
+import br.edu.ifpb.foodstore.service.payment.estrategias.CreditCard;
+import br.edu.ifpb.foodstore.service.payment.estrategias.PaymentType;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +70,7 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_success() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.CREDIT_CARD;
+        PaymentType paymentType = new CreditCard();
         orderManager.payOrder(order, paymentType);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
         orderVerifier.verify(paymentService).doPayment(paymentType);
@@ -79,7 +82,7 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_error() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.BILLET;
+        PaymentType paymentType = new Billet();
         doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(paymentType));
         orderManager.payOrder(order, paymentType);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
