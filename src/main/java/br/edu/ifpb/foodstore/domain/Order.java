@@ -29,8 +29,31 @@ public class Order {
 
     private OrderStatus status = OrderStatus.IN_PROGRESS;
 
-    public enum OrderStatus {
-        IN_PROGRESS, CANCELED, PAYMENT_SUCCESS, PAYMENT_REFUSED
+    public enum OrderStatus implements OrderState{
+        IN_PROGRESS {
+            @Override
+            public String CancelOrder() {
+                return "Canceling in progress order";
+            }
+        },
+        CANCELED {
+            @Override
+            public String CancelOrder() {
+                return "Order already canceled!";
+            }
+        },
+        PAYMENT_SUCCESS {
+            @Override
+            public String CancelOrder() {
+                return "Canceling already paid order";
+            }
+        },
+        PAYMENT_REFUSED {
+            @Override
+            public String CancelOrder() {
+                return "Canceling refused order";
+            }
+        }
     }
 
     public void addItem(OrderItem item) {
