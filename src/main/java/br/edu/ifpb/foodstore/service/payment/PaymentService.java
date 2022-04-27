@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private PaymentStrategy paymentStrategy;
+
+    private payment type = new payment();
+
     public enum PaymentType {
         CREDIT_CARD, DEBIT, BILLET, PAYPAL
     }
@@ -19,22 +23,9 @@ public class PaymentService {
     private final LogService logService;
 
     public void doPayment(PaymentType paymentType) throws Exception {
-        switch (paymentType) {
-            case CREDIT_CARD:
-                logService.info("Do credit card payment!");
-                break;
-            case DEBIT:
-                logService.info("Do debit payment!");
-                break;
-            case PAYPAL:
-                logService.info("Do paypal payment!");
-                break;
-            case BILLET:
-                logService.info("Do billet payment!");
-                break;
-            default:
-                throw new Exception("unknown payment method");
-        }
+        paymentStrategy = type.TipoPagamento(paymentType);
+
+        logService.info(paymentStrategy.pay());
     }
 
 }

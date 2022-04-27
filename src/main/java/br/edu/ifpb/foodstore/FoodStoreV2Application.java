@@ -2,6 +2,9 @@ package br.edu.ifpb.foodstore;
 
 import br.edu.ifpb.foodstore.repository.LogRegisterRepository;
 import br.edu.ifpb.foodstore.service.log.LogHandler;
+import br.edu.ifpb.foodstore.service.log.LogHandlerDatabase;
+import br.edu.ifpb.foodstore.service.log.LogHandlerFile;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,13 +19,13 @@ public class FoodStoreV2Application {
 
 	@Bean("logHandler")
 	@Primary
-	public LogHandler getLogHandlerDatabase(final LogRegisterRepository logRegisterRepository) {
-		return new LogHandler(logRegisterRepository, LogHandler.LogHandlerType.DATABASE);
+	public LogHandlerDatabase getLogHandlerDatabase(final LogRegisterRepository logRegisterRepository) {
+		return new LogHandlerDatabase(logRegisterRepository);
 	}
 
 	@Bean("logHandlerFile")
-	public LogHandler getLogHandlerFile() {
-		return new LogHandler(null, LogHandler.LogHandlerType.FILE);
+	public LogHandlerFile getLogHandlerFile() {
+		return new LogHandlerFile();
 	}
 
 }
