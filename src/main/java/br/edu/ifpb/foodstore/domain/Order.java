@@ -1,5 +1,7 @@
 package br.edu.ifpb.foodstore.domain;
 
+import br.edu.ifpb.foodstore.domain.state.OrderEnum;
+import br.edu.ifpb.foodstore.service.log.LogService;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,11 +29,7 @@ public class Order {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
 
-    private OrderStatus status = OrderStatus.IN_PROGRESS;
-
-    public enum OrderStatus {
-        IN_PROGRESS, CANCELED, PAYMENT_SUCCESS, PAYMENT_REFUSED
-    }
+    private OrderEnum status = OrderEnum.IN_PROGRESS;
 
     public void addItem(OrderItem item) {
         this.items.add(item);
