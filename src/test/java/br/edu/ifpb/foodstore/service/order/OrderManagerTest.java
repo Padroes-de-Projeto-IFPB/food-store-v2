@@ -4,6 +4,7 @@ import br.edu.ifpb.foodstore.domain.Customer;
 import br.edu.ifpb.foodstore.domain.Order;
 import br.edu.ifpb.foodstore.domain.OrderItem;
 import br.edu.ifpb.foodstore.domain.Product;
+import br.edu.ifpb.foodstore.domain.state.OrderEnum;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import br.edu.ifpb.foodstore.service.mail.MailNotification;
 import br.edu.ifpb.foodstore.service.payment.PaymentService;
@@ -47,7 +48,7 @@ public class OrderManagerTest {
     public void init() {
         order = Order.builder()
                 .id(1L)
-                .status(Order.OrderStatus.IN_PROGRESS)
+                .status(OrderEnum.IN_PROGRESS)
                 .customer(Customer.builder()
                         .email("testuser@test.com")
                         .name("Diego Pessoa")
@@ -91,7 +92,7 @@ public class OrderManagerTest {
     @Test
     void cancelOrderTest_inProgress() {
         orderManager.cancelOrder(order);
-        assertThat(order.getStatus(), equalTo(Order.OrderStatus.CANCELED));
+        assertThat(order.getStatus(), equalTo(OrderEnum.CANCELED));
         InOrder orderVerifier = Mockito.inOrder(logService, mailNotification);
         orderVerifier.verify(logService).info("Canceling in progress order");
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 canceled");
@@ -102,16 +103,16 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void cancelOrderTest_canceled() {
-        order.setStatus(Order.OrderStatus.CANCELED);
+        order.setStatus(OrderEnum.CANCELED);
         assertThrows(OrderException.class, () -> orderManager.cancelOrder(order));
     }
 
     @SneakyThrows
     @Test
     void cancelOrderTest_paymentRefused() {
-        order.setStatus(Order.OrderStatus.PAYMENT_REFUSED);
+        order.setStatus(OrderEnum.PAYMENT_REFUSED);
         orderManager.cancelOrder(order);
-        assertThat(order.getStatus(), equalTo(Order.OrderStatus.CANCELED));
+        assertThat(order.getStatus(), equalTo(OrderEnum.CANCELED));
         InOrder orderVerifier = Mockito.inOrder(logService, mailNotification);
         orderVerifier.verify(logService).info("Canceling refused order");
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 canceled");
@@ -122,9 +123,9 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void cancelOrderTest_paymentSuccess() {
-        order.setStatus(Order.OrderStatus.PAYMENT_SUCCESS);
+        order.setStatus(OrderEnum.PAYMENT_SUCCESS);
         orderManager.cancelOrder(order);
-        assertThat(order.getStatus(), equalTo(Order.OrderStatus.CANCELED));
+        assertThat(order.getStatus(), equalTo(OrderEnum.CANCELED));
         InOrder orderVerifier = Mockito.inOrder(logService, mailNotification);
         orderVerifier.verify(logService).info("Canceling already paid order");
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 canceled");
