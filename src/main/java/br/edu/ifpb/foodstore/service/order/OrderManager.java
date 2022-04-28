@@ -31,18 +31,10 @@ public class OrderManager {
     }
 
     public void cancelOrder(Order order) throws OrderException {
-        switch(order.getStatus()) {
-            case CANCELED:
-                throw new OrderException("Order already canceled!");
-            case IN_PROGRESS:
-                logService.info("Canceling in progress order");
-                break;
-            case PAYMENT_REFUSED:
-                logService.info("Canceling refused order");
-                break;
-            case PAYMENT_SUCCESS:
-                logService.info("Canceling already paid order");
-                break;
+        if (order.getStatus() == Order.OrderStatus.CANCELED){
+            throw new OrderException(order.getStatus().cancelamento());
+        } else {
+            logService.info(order.getStatus().cancelamento());
         }
         order.setStatus(Order.OrderStatus.CANCELED);
         mailNotification.sendMailNotificationToAdmin(String.format("Order %d canceled", order.getId()));

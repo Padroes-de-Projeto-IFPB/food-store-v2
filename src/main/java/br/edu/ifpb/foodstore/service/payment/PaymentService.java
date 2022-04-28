@@ -17,24 +17,17 @@ public class PaymentService {
     }
 
     private final LogService logService;
+    private PaymentInterface payment;
+    private ManagerPayment manager = new ManagerPayment();
+
 
     public void doPayment(PaymentType paymentType) throws Exception {
-        switch (paymentType) {
-            case CREDIT_CARD:
-                logService.info("Do credit card payment!");
-                break;
-            case DEBIT:
-                logService.info("Do debit payment!");
-                break;
-            case PAYPAL:
-                logService.info("Do paypal payment!");
-                break;
-            case BILLET:
-                logService.info("Do billet payment!");
-                break;
-            default:
-                throw new Exception("unknown payment method");
+        try {
+            payment = manager.typePayment(paymentType);
+            logService.info(payment.getPayment());
+        }
+        catch (Exception e) {
+            throw new Exception(e);
         }
     }
-
 }
