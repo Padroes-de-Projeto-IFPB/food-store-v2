@@ -1,4 +1,4 @@
-package br.edu.ifpb.foodstore.domain;
+package br.edu.ifpb.foodstore.repository.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
