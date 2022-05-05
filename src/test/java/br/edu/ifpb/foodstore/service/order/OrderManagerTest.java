@@ -1,9 +1,6 @@
 package br.edu.ifpb.foodstore.service.order;
 
-import br.edu.ifpb.foodstore.domain.Customer;
-import br.edu.ifpb.foodstore.domain.Order;
-import br.edu.ifpb.foodstore.domain.OrderItem;
-import br.edu.ifpb.foodstore.domain.Product;
+import br.edu.ifpb.foodstore.domain.*;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import br.edu.ifpb.foodstore.service.mail.MailNotification;
 import br.edu.ifpb.foodstore.service.payment.PaymentService;
@@ -67,10 +64,10 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_success() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.CREDIT_CARD;
-        orderManager.payOrder(order, paymentType);
+        Payment payment = new CreditCard();
+        orderManager.payOrder(order, payment);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
-        orderVerifier.verify(paymentService).doPayment(paymentType);
+        orderVerifier.verify(paymentService).doPayment(payment);
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 completed successfully");
         orderVerifier.verify(mailNotification).sendMailNotificationToCustomer("Order 1 completed successfully", order.getCustomer());
         orderVerifier.verify(logService).info("payment finished");
@@ -79,11 +76,11 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_error() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.BILLET;
-        doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(paymentType));
-        orderManager.payOrder(order, paymentType);
+        Payment payment = new Billet();
+        doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(payment));
+        orderManager.payOrder(order, payment);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
-        orderVerifier.verify(paymentService).doPayment(paymentType);
+        orderVerifier.verify(paymentService).doPayment(payment);
         orderVerifier.verify(logService).error("payment refused");
     }
 

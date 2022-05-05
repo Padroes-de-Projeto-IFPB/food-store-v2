@@ -1,5 +1,6 @@
 package br.edu.ifpb.foodstore.service.payment;
 
+import br.edu.ifpb.foodstore.domain.Payment;
 import br.edu.ifpb.foodstore.service.log.LogHandler;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import lombok.NoArgsConstructor;
@@ -18,23 +19,8 @@ public class PaymentService {
 
     private final LogService logService;
 
-    public void doPayment(PaymentType paymentType) throws Exception {
-        switch (paymentType) {
-            case CREDIT_CARD:
-                logService.info("Do credit card payment!");
-                break;
-            case DEBIT:
-                logService.info("Do debit payment!");
-                break;
-            case PAYPAL:
-                logService.info("Do paypal payment!");
-                break;
-            case BILLET:
-                logService.info("Do billet payment!");
-                break;
-            default:
-                throw new Exception("unknown payment method");
-        }
+    public void doPayment(Payment payment) throws Exception {
+        payment.doPay(logService);
     }
 
 }

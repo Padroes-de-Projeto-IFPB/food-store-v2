@@ -1,6 +1,7 @@
 package br.edu.ifpb.foodstore.service.order;
 
 import br.edu.ifpb.foodstore.domain.Order;
+import br.edu.ifpb.foodstore.domain.Payment;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import br.edu.ifpb.foodstore.service.mail.MailNotification;
 import br.edu.ifpb.foodstore.service.payment.PaymentService;
@@ -15,7 +16,7 @@ public class OrderManager {
     private final MailNotification mailNotification;
     private final LogService logService;
 
-    public void payOrder(Order order, PaymentService.PaymentType paymentType) {
+    public void payOrder(Order order, Payment paymentType) {
         order.setStatus(Order.OrderStatus.IN_PROGRESS);
         try {
             paymentService.doPayment(paymentType);
