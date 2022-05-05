@@ -4,6 +4,10 @@ import br.edu.ifpb.foodstore.domain.Customer;
 import br.edu.ifpb.foodstore.domain.Order;
 import br.edu.ifpb.foodstore.domain.OrderItem;
 import br.edu.ifpb.foodstore.domain.Product;
+import br.edu.ifpb.foodstore.domain.orderState.OrderStatus;
+import br.edu.ifpb.foodstore.domain.paymentStrategy.CreditCard;
+import br.edu.ifpb.foodstore.domain.paymentStrategy.Debit;
+import br.edu.ifpb.foodstore.domain.paymentStrategy.PaymentInterface;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import br.edu.ifpb.foodstore.service.mail.MailNotification;
 import br.edu.ifpb.foodstore.service.payment.PaymentService;
@@ -47,7 +51,7 @@ public class OrderManagerTest {
     public void init() {
         order = Order.builder()
                 .id(1L)
-                .status(Order.OrderStatus.IN_PROGRESS)
+                .status(OrderStatus.IN_PROGRESS)
                 .customer(Customer.builder()
                         .email("testuser@test.com")
                         .name("Diego Pessoa")
@@ -67,10 +71,10 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_success() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.CREDIT_CARD;
-        orderManager.payOrder(order, paymentType);
+        PaymentInterface payment = new CreditCard();
+        orderManager.payOrder(order, payment);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
-        orderVerifier.verify(paymentService).doPayment(paymentType);
+        orderVerifier.verify(paymentService).doPayment(payment);
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 completed successfully");
         orderVerifier.verify(mailNotification).sendMailNotificationToCustomer("Order 1 completed successfully", order.getCustomer());
         orderVerifier.verify(logService).info("payment finished");
@@ -79,11 +83,11 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_error() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.BILLET;
-        doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(paymentType));
-        orderManager.payOrder(order, paymentType);
+        PaymentInterface payment = new Debit();
+        doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(payment));
+        orderManager.payOrder(order, payment);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
-        orderVerifier.verify(paymentService).doPayment(paymentType);
+        orderVerifier.verify(paymentService).doPayment(payment);
         orderVerifier.verify(logService).error("payment refused");
     }
 
@@ -91,7 +95,7 @@ public class OrderManagerTest {
     @Test
     void cancelOrderTest_inProgress() {
         orderManager.cancelOrder(order);
-        assertThat(order.getStatus(), equalTo(Order.OrderStatus.CANCELED));
+        assertThat(order.getStatus(), equalTo(OrderStatus.CANCELED));
         InOrder orderVerifier = Mockito.inOrder(logService, mailNotification);
         orderVerifier.verify(logService).info("Canceling in progress order");
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 canceled");
@@ -102,16 +106,16 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void cancelOrderTest_canceled() {
-        order.setStatus(Order.OrderStatus.CANCELED);
+        order.setStatus(OrderStatus.CANCELED);
         assertThrows(OrderException.class, () -> orderManager.cancelOrder(order));
     }
 
     @SneakyThrows
     @Test
     void cancelOrderTest_paymentRefused() {
-        order.setStatus(Order.OrderStatus.PAYMENT_REFUSED);
+        order.setStatus(OrderStatus.PAYMENT_REFUSED);
         orderManager.cancelOrder(order);
-        assertThat(order.getStatus(), equalTo(Order.OrderStatus.CANCELED));
+        assertThat(order.getStatus(), equalTo(OrderStatus.CANCELED));
         InOrder orderVerifier = Mockito.inOrder(logService, mailNotification);
         orderVerifier.verify(logService).info("Canceling refused order");
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 canceled");
@@ -122,9 +126,9 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void cancelOrderTest_paymentSuccess() {
-        order.setStatus(Order.OrderStatus.PAYMENT_SUCCESS);
+        order.setStatus(OrderStatus.PAYMENT_SUCCESS);
         orderManager.cancelOrder(order);
-        assertThat(order.getStatus(), equalTo(Order.OrderStatus.CANCELED));
+        assertThat(order.getStatus(), equalTo(OrderStatus.CANCELED));
         InOrder orderVerifier = Mockito.inOrder(logService, mailNotification);
         orderVerifier.verify(logService).info("Canceling already paid order");
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 canceled");
