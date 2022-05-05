@@ -6,6 +6,9 @@ import br.edu.ifpb.foodstore.domain.OrderItem;
 import br.edu.ifpb.foodstore.domain.Product;
 import br.edu.ifpb.foodstore.service.log.LogService;
 import br.edu.ifpb.foodstore.service.mail.MailNotification;
+import br.edu.ifpb.foodstore.service.payment.BILLET;
+import br.edu.ifpb.foodstore.service.payment.CREDIT_CARD;
+import br.edu.ifpb.foodstore.service.payment.EstrategiaPayment;
 import br.edu.ifpb.foodstore.service.payment.PaymentService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,10 +70,10 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_success() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.CREDIT_CARD;
-        orderManager.payOrder(order, paymentType);
+        EstrategiaPayment estrategiaPayment = new CREDIT_CARD();
+        orderManager.payOrder(order, estrategiaPayment);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
-        orderVerifier.verify(paymentService).doPayment(paymentType);
+        orderVerifier.verify(paymentService).doPayment(estrategiaPayment);
         orderVerifier.verify(mailNotification).sendMailNotificationToAdmin("Order 1 completed successfully");
         orderVerifier.verify(mailNotification).sendMailNotificationToCustomer("Order 1 completed successfully", order.getCustomer());
         orderVerifier.verify(logService).info("payment finished");
@@ -79,11 +82,11 @@ public class OrderManagerTest {
     @SneakyThrows
     @Test
     void payOrderTest_error() {
-        PaymentService.PaymentType paymentType = PaymentService.PaymentType.BILLET;
-        doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(paymentType));
-        orderManager.payOrder(order, paymentType);
+        EstrategiaPayment estrategiaPayment = new BILLET();
+        doThrow(new Exception(("unknown payment method"))).when(paymentService).doPayment(eq(estrategiaPayment));
+        orderManager.payOrder(order, estrategiaPayment);
         InOrder orderVerifier = Mockito.inOrder(paymentService, mailNotification, logService);
-        orderVerifier.verify(paymentService).doPayment(paymentType);
+        orderVerifier.verify(paymentService).doPayment(estrategiaPayment);
         orderVerifier.verify(logService).error("payment refused");
     }
 
