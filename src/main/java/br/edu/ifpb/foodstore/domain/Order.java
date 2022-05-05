@@ -1,5 +1,6 @@
 package br.edu.ifpb.foodstore.domain;
 
+import br.edu.ifpb.foodstore.domain.orderState.OrderStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,10 +29,6 @@ public class Order {
     private List<OrderItem> items;
 
     private OrderStatus status = OrderStatus.IN_PROGRESS;
-
-    public enum OrderStatus {
-        IN_PROGRESS, CANCELED, PAYMENT_SUCCESS, PAYMENT_REFUSED
-    }
 
     public void addItem(OrderItem item) {
         this.items.add(item);
