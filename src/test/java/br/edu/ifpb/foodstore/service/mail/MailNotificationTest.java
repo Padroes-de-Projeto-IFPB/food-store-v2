@@ -1,12 +1,7 @@
 package br.edu.ifpb.foodstore.service.mail;
 
 import br.edu.ifpb.foodstore.domain.Customer;
-import br.edu.ifpb.foodstore.domain.Order;
-import br.edu.ifpb.foodstore.domain.OrderItem;
-import br.edu.ifpb.foodstore.domain.Product;
 import br.edu.ifpb.foodstore.service.log.LogService;
-import br.edu.ifpb.foodstore.service.order.OrderManager;
-import br.edu.ifpb.foodstore.service.payment.PaymentService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,15 +10,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-
-import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Collections;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 public class MailNotificationTest {

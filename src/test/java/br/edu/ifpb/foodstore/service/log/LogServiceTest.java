@@ -34,7 +34,7 @@ public class LogServiceTest {
     @SneakyThrows
     @Test
     void infoTest() {
-        logService.debug("info message");
+        logService.info("info message");
         InOrder orderVerifier = Mockito.inOrder(logHandler);
         orderVerifier.verify(logHandler).log("info message");
     }
